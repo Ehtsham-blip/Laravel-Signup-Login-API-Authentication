@@ -161,23 +161,23 @@ public function resetPassword(Request $request){
         'old_password' => 'required',  //current password
         'new_password' => 'required',  
     ]);
+    if ($validator->fails()) {
+        return $this->sendResponse(['success' => false, 'message' => $validator->errors()], 422);
+    }
+
     $user = User::where('email', $request->email)->first();
 
     if ($user) {
         if (!Hash::check($request->old_password, $user->password)){
 
-        return $this->sendResponse( false, "Incorrect Password!",[], 422);
-    }
-
-    if ($validator->fails()) {
-        return $this->sendResponse( false,$validator->errors(),[], 422);
+        return $this->sendResponse(['success' => false, 'message' =>"Incoorect Password!"], 422);
     }
 
     $user->update([
         'password'=>Hash::make($request->new_password)
     ]);
-    return $this->sendResponse(true,'Password updated successfully');
-} 
+    return $this->sendResponse(['success' =>true, 'message' => 'Password updated successfully']);
+}
 }
 
 //confirmation mail
